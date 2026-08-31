@@ -1,0 +1,35 @@
+name: CI/CD Docker Pipeline
+
+on:
+  push:
+    branches: [ "main", "master" ]
+  pull_request:
+    branches: [ "main", "master" ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Copiar repositorio a la máquina virtual
+      uses: actions/checkout@v4
+
+    - name: Configurar entorno de Node.js y pnpm
+      uses: pnpm/action-setup@v4
+      with:
+        version: 11.24.0
+
+    - name: Instalar Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: 22
+        cache: 'pnpm'
+
+    - name: Instalar dependencias
+      run: pnpm install --frozen-lockfile
+
+    - name: Ejecutar Build de prueba (Frontend)
+      run: pnpm run build
+
+    - name: Construir imagen de Docker (Validación de Dockerfile)
+      run: docker build -t preptech-frontend:${{ github.sha }} .
