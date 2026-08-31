@@ -24,12 +24,16 @@ jobs:
       with:
         node-version: 22
         cache: 'pnpm'
+        cache-dependency-path: preptech-frontend/pnpm-lock.yaml
 
     - name: Instalar dependencias
+      working-directory: ./preptech-frontend
       run: pnpm install --frozen-lockfile
 
     - name: Ejecutar Build de prueba (Frontend)
+      working-directory: ./preptech-frontend
       run: pnpm run build
 
     - name: Construir imagen de Docker (Validación de Dockerfile)
+      working-directory: ./preptech-frontend
       run: docker build -t preptech-frontend:${{ github.sha }} .
