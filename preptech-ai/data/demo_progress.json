@@ -1,0 +1,7 @@
+[
+  {"preguntaId": "two-sum-ordenado", "titulo": "Par con suma objetivo en arreglo ordenado", "area": "algoritmos", "dificultad": "facil", "empresa": "Amazon", "segundos": 640, "resultado": "resuelto", "dias_atras": 12},
+  {"preguntaId": "ventana-maxima", "titulo": "Subarreglo de suma máxima", "area": "algoritmos", "dificultad": "medio", "empresa": "Google", "segundos": 1320, "resultado": "parcial", "dias_atras": 9},
+  {"preguntaId": "bfs-laberinto", "titulo": "Camino más corto en una cuadrícula", "area": "algoritmos", "dificultad": "medio", "empresa": "Microsoft", "segundos": 1500, "resultado": "resuelto", "dias_atras": 6},
+  {"preguntaId": "acortador-urls", "titulo": "Diseña un acortador de URLs", "area": "sistemas", "dificultad": "medio", "empresa": "Google", "segundos": 2100, "resultado": "sin-resolver", "dias_atras": 4},
+  {"preguntaId": "rate-limiter", "titulo": "Diseña un limitador de peticiones", "area": "sistemas", "dificultad": "facil", "empresa": "Amazon", "segundos": 1500, "resultado": "parcial", "dias_atras": 2}
+]
