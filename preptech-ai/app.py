@@ -18,9 +18,10 @@ from services.tools import _banco  # noqa: E402
 st.set_page_config(page_title="Coach PrepTech", page_icon="🎯", layout="wide")
 
 AREAS = {"Algoritmos": "algoritmos", "System Design": "sistemas", "Behavioral": "comportamiento"}
-EJEMPLO = ("En mi proyecto tuvimos un problema con la base de datos que se caía cuando había "
-           "muchos usuarios. Me encargué de investigarlo. Revisé los logs, encontré que faltaba "
-           "un índice y lo creé. Las consultas se volvieron mucho más rápidas.")
+EJEMPLO = ("En mi proyecto tuvimos un desacuerdo con un compañero sobre si usar MongoDB o PostgreSQL "
+           "para el módulo de pagos. Me tocaba proponer la solución. Armé una prueba de carga con ambas "
+           "opciones y presenté los resultados al equipo. Elegimos PostgreSQL y las consultas se volvieron "
+           "mucho más rápidas.")
 ATAJOS = {"🎯 Recomiéndame preguntas": "Recomiéndame preguntas para practicar según mi empresa objetivo.",
           "📊 Mi progreso": "Muéstrame mi progreso de las últimas semanas.",
           "⏳ Cuenta regresiva": "¿Cuántos días me faltan para mi entrevista y qué ritmo debo llevar?"}
@@ -175,6 +176,7 @@ def tab_analizador(svc, tecnica):
                     ss.usage.completion += u.completion
                     res[t] = (d, u, msgs)
             ss.compare = res
+            st.rerun()  # refresca el contador de tokens del sidebar
         except (InputError, LLMError) as e:
             st.warning(str(e))
         except Exception:  # noqa: BLE001
