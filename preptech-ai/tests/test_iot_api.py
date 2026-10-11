@@ -61,3 +61,20 @@ def test_chat_requires_connection(monkeypatch):
 
 def test_chat_rejects_bad_area_and_empty_message():
     assert client.post("/api/coach/chat", json={"message": "hola", "area": "x"}).status_code == 422
+
+
+def test_review_parsing_and_validation():
+    from services.llm_service import LLMError, parse_review
+    ok = parse_review('{"score": 9, "correctness": "x", "strength": "a", "improvements": ["1","2","3"], "next_step": "n"}')
+    assert ok["score"] == 5 and ok["correctness"] == "parcial" and len(ok["improvements"]) == 2
+    with pytest.raises(LLMError):
+        parse_review("no json")
+
+
+def test_review_endpoint_errors(monkeypatch):
+    assert client.post("/api/coach/review", json={"question_id": "nope", "solution": "x"}).status_code == 404
+    monkeypatch.setattr(server.store, "ui_key", None)
+    monkeypatch.setenv("OPENAI_API_KEY", "")
+    qid = server._banco()["preguntas"][0]["id"]
+    assert client.post("/api/coach/review", json={"question_id": qid, "solution": ""}).status_code == 422
+    assert client.post("/api/coach/review", json={"question_id": qid, "solution": "x"}).status_code == 409

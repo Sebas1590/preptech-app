@@ -2,7 +2,8 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { AppShell } from "@/components/AppShell";
 import { PREGUNTAS, etiquetaArea, etiquetaDificultad } from "@/lib/preptech-data";
-import { formatearTiempo, usePrepTech } from "@/lib/preptech-store";
+import { api, useAiStatus } from "@/lib/api";
+import { formatearTiempo, usePrepTech, type RevisionIA } from "@/lib/preptech-store";
 
 export const Route = createFileRoute("/practica/$preguntaId")({
   head: () => ({
@@ -23,6 +24,13 @@ export const Route = createFileRoute("/practica/$preguntaId")({
   component: Practica,
 });
 
+const etiquetaRevision: Record<RevisionIA["correctness"], string> = {
+  correcto: "Correcto",
+  parcial: "Parcial",
+  incorrecto: "Incorrecto",
+  sin_intento: "Sin intento",
+};
+
 function Practica() {
   const { preguntaId } = Route.useParams();
   const navigate = useNavigate();
@@ -34,6 +42,10 @@ function Practica() {
   const [codigo, setCodigo] = useState(pregunta?.plantilla ?? "");
   const [pistasVisibles, setPistasVisibles] = useState(0);
   const [notas, setNotas] = useState("");
+  const { status } = useAiStatus();
+  const [revision, setRevision] = useState<RevisionIA | null>(null);
+  const [revisando, setRevisando] = useState(false);
+  const [errorIA, setErrorIA] = useState<string | null>(null);
   const intervalo = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
@@ -57,6 +69,22 @@ function Practica() {
   const limite = pregunta.minutosObjetivo * 60;
   const excedido = segundos > limite;
 
+  const pedirRevision = async () => {
+    setRevisando(true);
+    setErrorIA(null);
+    try {
+      const r = await api<{ review: RevisionIA }>("/coach/review", {
+        method: "POST",
+        json: { question_id: pregunta.id, solution: codigo, notes: notas },
+      });
+      setRevision(r.review);
+    } catch (e) {
+      setErrorIA(e instanceof Error ? e.message : "Error inesperado");
+    } finally {
+      setRevisando(false);
+    }
+  };
+
   const finalizar = (resultado: "resuelto" | "parcial" | "sin-resolver") => {
     registrarIntento({
       preguntaId: pregunta.id,
@@ -67,6 +95,7 @@ function Practica() {
       segundos,
       resultado,
       notas,
+      ...(revision ? { feedbackIA: revision } : {}),
     });
     navigate({ to: "/" });
   };
@@ -164,6 +193,58 @@ function Practica() {
               placeholder="Retroalimentación: qué te costó, qué repasar…"
               className="h-20 w-full resize-none rounded-sm border border-input bg-surface-2 p-3 text-sm outline-none placeholder:text-muted-foreground focus:border-primary"
             />
+            <button
+              onClick={pedirRevision}
+              disabled={revisando || !status?.connected}
+              title={status?.connected ? "" : "Conecta la IA en Configuración de IA"}
+              className="rounded-sm border border-primary px-4 py-2 text-sm text-primary disabled:border-border disabled:text-muted-foreground"
+            >
+              {revisando ? "Analizando tu solución…" : "🤖 Pedir retroalimentación de la IA"}
+            </button>
+            {!status?.connected ? (
+              <p className="text-xs text-muted-foreground">
+                La IA está desconectada.{" "}
+                <Link to="/ia" className="text-primary underline">
+                  Configurar IA
+                </Link>
+              </p>
+            ) : null}
+            {errorIA ? (
+              <p role="alert" className="rounded-sm border border-signal px-3 py-2 text-sm text-signal">
+                {errorIA}
+              </p>
+            ) : null}
+            {revision ? (
+              <div className="space-y-3 rounded-sm border border-border bg-surface-2 p-4 text-sm" aria-live="polite">
+                <p className="label-xs">
+                  Retroalimentación de la IA · {etiquetaRevision[revision.correctness]} · nota {revision.score}/5
+                </p>
+                <p>
+                  <span className="font-semibold text-primary">👍 Lo que hiciste bien: </span>
+                  {revision.strength}
+                </p>
+                {revision.improvements.length ? (
+                  <div>
+                    <p className="font-semibold">🔧 Lo que puedes mejorar:</p>
+                    <ul className="mt-1 list-disc space-y-1 pl-5 text-foreground/85">
+                      {revision.improvements.map((m) => (
+                        <li key={m}>{m}</li>
+                      ))}
+                    </ul>
+                  </div>
+                ) : null}
+                {revision.complexity ? (
+                  <p className="font-mono text-xs text-muted-foreground">Complejidad estimada: {revision.complexity}</p>
+                ) : null}
+                <p>
+                  <span className="font-semibold">➡️ Siguiente paso: </span>
+                  {revision.next_step}
+                </p>
+                <p className="text-[11px] text-muted-foreground">
+                  Orientativa: no predice una contratación. Se guarda junto a tu intento al finalizar.
+                </p>
+              </div>
+            ) : null}
             <div className="flex flex-wrap gap-2">
               <button
                 onClick={() => finalizar("resuelto")}

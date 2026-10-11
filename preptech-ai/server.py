@@ -209,6 +209,28 @@ def coach_star(body: StarBody, request: Request):
     return guard(request, run)
 
 
+class ReviewBody(BaseModel):
+    question_id: str = Field(max_length=80)
+    solution: str = Field(max_length=8000)
+    notes: str = Field(default="", max_length=2000)
+
+
+@app.post("/api/coach/review")
+def coach_review(body: ReviewBody, request: Request):
+    """Retroalimentación de la IA sobre el intento del estudiante en una pregunta del banco."""
+    q = next((x for x in _banco()["preguntas"] if x["id"] == body.question_id), None)
+    if not q:
+        raise HTTPException(404, "Pregunta no encontrada.")
+
+    def run():
+        if not (body.solution.strip() or body.notes.strip()):
+            raise InputError("Escribe tu solución o tus notas antes de pedir retroalimentación.")
+        limiter_for(request).check()
+        d, u = service().review_solution(q["titulo"], q["enunciado"], q["area"], body.solution, body.notes)
+        return {"review": d, "usage": {"prompt": u.prompt, "completion": u.completion, "total": u.total}}
+    return guard(request, run)
+
+
 @app.get("/api/coach/library")
 def coach_library():
     """Biblioteca de prompts (solo lectura) y técnicas disponibles."""

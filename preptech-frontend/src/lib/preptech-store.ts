@@ -1,6 +1,15 @@
 import { useCallback, useEffect, useState } from "react";
 import type { Area, Dificultad } from "./preptech-data";
 
+export type RevisionIA = {
+  score: number;
+  correctness: "correcto" | "parcial" | "incorrecto" | "sin_intento";
+  strength: string;
+  improvements: string[];
+  complexity: string;
+  next_step: string;
+};
+
 export type Intento = {
   id: string;
   preguntaId: string;
@@ -12,6 +21,7 @@ export type Intento = {
   resultado: "resuelto" | "parcial" | "sin-resolver";
   fecha: string;
   notas?: string;
+  feedbackIA?: RevisionIA;
 };
 
 export type GrabacionConductual = {

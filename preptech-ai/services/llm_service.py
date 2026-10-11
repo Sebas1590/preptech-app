@@ -9,6 +9,7 @@ import openai
 from openai import OpenAI
 
 from prompts import TECHNIQUES, build_system_prompt
+from prompts.review import build_review_messages
 from prompts.feedback import STAR_KEYS
 from services.guardrails import looks_like_injection, wrap_user_text
 from services.tools import TOOLS_SCHEMA, execute_tool
@@ -121,6 +122,36 @@ class LLMService:
             raise _translate(e) from e
         usage.add(r.usage)
         return parse_star(r.choices[0].message.content), usage, messages
+
+    # ---------- Revisión de una solución técnica ----------
+    def review_solution(self, titulo: str, enunciado: str, area: str, solucion: str, notas: str) -> tuple[dict, Usage]:
+        messages = build_review_messages(titulo, wrap_user_text(enunciado), area,
+                                         wrap_user_text(solucion), wrap_user_text(notas))
+        usage = Usage()
+        try:
+            r = self.client.chat.completions.create(
+                model=self.model, messages=messages, temperature=0.2,
+                max_completion_tokens=600, response_format={"type": "json_object"})
+        except Exception as e:  # noqa: BLE001
+            raise _translate(e) from e
+        usage.add(r.usage)
+        return parse_review(r.choices[0].message.content), usage
+
+
+def parse_review(raw: str | None) -> dict:
+    try:
+        d = json.loads(raw or "")
+        correct = d.get("correctness")
+        return {
+            "score": max(1, min(5, int(d["score"]))),
+            "correctness": correct if correct in ("correcto", "parcial", "incorrecto", "sin_intento") else "parcial",
+            "strength": str(d["strength"]),
+            "improvements": [str(x) for x in d.get("improvements", [])][:2],
+            "complexity": str(d.get("complexity", "")),
+            "next_step": str(d["next_step"]),
+        }
+    except (ValueError, KeyError, TypeError) as e:
+        raise LLMError("El modelo devolvió una respuesta con formato inválido. Intenta de nuevo.") from e
 
 
 def parse_star(raw: str | None) -> dict:
