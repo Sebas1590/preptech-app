@@ -6,6 +6,7 @@ de práctica sin enviar texto innecesario (ahorro de tokens).
 from .algorithms import ALGORITHMS_MODE
 from .behavioral import BEHAVIORAL_MODE
 from .system_design import SYSTEM_DESIGN_MODE
+from .iot import IOT_MODE
 
 SYSTEM_PROMPT = """\
 Eres "Coach PrepTech", un mentor de preparación para entrevistas técnicas en \
@@ -45,6 +46,7 @@ _MODES = {
     "algoritmos": ALGORITHMS_MODE,
     "sistemas": SYSTEM_DESIGN_MODE,
     "comportamiento": BEHAVIORAL_MODE,
+    "iot": IOT_MODE,
 }
 
 

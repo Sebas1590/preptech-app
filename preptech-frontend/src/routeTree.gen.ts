@@ -11,7 +11,10 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as BancoRouteImport } from './routes/banco'
+import { Route as CoachRouteImport } from './routes/coach'
 import { Route as ConductualRouteImport } from './routes/conductual'
+import { Route as IaRouteImport } from './routes/ia'
+import { Route as IotRouteImport } from './routes/iot'
 import { Route as PerfilRouteImport } from './routes/perfil'
 import { Route as PracticaPreguntaIdRouteImport } from './routes/practica.$preguntaId'
 
@@ -25,9 +28,24 @@ const BancoRoute = BancoRouteImport.update({
   path: '/banco',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CoachRoute = CoachRouteImport.update({
+  id: '/coach',
+  path: '/coach',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ConductualRoute = ConductualRouteImport.update({
   id: '/conductual',
   path: '/conductual',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const IaRoute = IaRouteImport.update({
+  id: '/ia',
+  path: '/ia',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const IotRoute = IotRouteImport.update({
+  id: '/iot',
+  path: '/iot',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PerfilRoute = PerfilRouteImport.update({
@@ -44,14 +62,20 @@ const PracticaPreguntaIdRoute = PracticaPreguntaIdRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/banco': typeof BancoRoute
+  '/coach': typeof CoachRoute
   '/conductual': typeof ConductualRoute
+  '/ia': typeof IaRoute
+  '/iot': typeof IotRoute
   '/perfil': typeof PerfilRoute
   '/practica/$preguntaId': typeof PracticaPreguntaIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/banco': typeof BancoRoute
+  '/coach': typeof CoachRoute
   '/conductual': typeof ConductualRoute
+  '/ia': typeof IaRoute
+  '/iot': typeof IotRoute
   '/perfil': typeof PerfilRoute
   '/practica/$preguntaId': typeof PracticaPreguntaIdRoute
 }
@@ -59,21 +83,42 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/banco': typeof BancoRoute
+  '/coach': typeof CoachRoute
   '/conductual': typeof ConductualRoute
+  '/ia': typeof IaRoute
+  '/iot': typeof IotRoute
   '/perfil': typeof PerfilRoute
   '/practica/$preguntaId': typeof PracticaPreguntaIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    '/' | '/banco' | '/conductual' | '/perfil' | '/practica/$preguntaId'
+    | '/'
+    | '/banco'
+    | '/coach'
+    | '/conductual'
+    | '/ia'
+    | '/iot'
+    | '/perfil'
+    | '/practica/$preguntaId'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/banco' | '/conductual' | '/perfil' | '/practica/$preguntaId'
+  to:
+    | '/'
+    | '/banco'
+    | '/coach'
+    | '/conductual'
+    | '/ia'
+    | '/iot'
+    | '/perfil'
+    | '/practica/$preguntaId'
   id:
     | '__root__'
     | '/'
     | '/banco'
+    | '/coach'
     | '/conductual'
+    | '/ia'
+    | '/iot'
     | '/perfil'
     | '/practica/$preguntaId'
   fileRoutesById: FileRoutesById
@@ -81,7 +126,10 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   BancoRoute: typeof BancoRoute
+  CoachRoute: typeof CoachRoute
   ConductualRoute: typeof ConductualRoute
+  IaRoute: typeof IaRoute
+  IotRoute: typeof IotRoute
   PerfilRoute: typeof PerfilRoute
   PracticaPreguntaIdRoute: typeof PracticaPreguntaIdRoute
 }
@@ -102,11 +150,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BancoRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/coach': {
+      id: '/coach'
+      path: '/coach'
+      fullPath: '/coach'
+      preLoaderRoute: typeof CoachRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/conductual': {
       id: '/conductual'
       path: '/conductual'
       fullPath: '/conductual'
       preLoaderRoute: typeof ConductualRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/ia': {
+      id: '/ia'
+      path: '/ia'
+      fullPath: '/ia'
+      preLoaderRoute: typeof IaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/iot': {
+      id: '/iot'
+      path: '/iot'
+      fullPath: '/iot'
+      preLoaderRoute: typeof IotRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/perfil': {
@@ -129,7 +198,10 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   BancoRoute: BancoRoute,
+  CoachRoute: CoachRoute,
   ConductualRoute: ConductualRoute,
+  IaRoute: IaRoute,
+  IotRoute: IotRoute,
   PerfilRoute: PerfilRoute,
   PracticaPreguntaIdRoute: PracticaPreguntaIdRoute,
 }

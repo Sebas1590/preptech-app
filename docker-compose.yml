@@ -1,0 +1,13 @@
+# Frontend (Nginx) + API (FastAPI). La API Key se conecta desde la UI o con OPENAI_API_KEY.
+services:
+  api:
+    build: ./preptech-ai
+    environment:
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      OPENAI_MODEL: ${OPENAI_MODEL:-gpt-4.1-mini}
+  web:
+    build: ./preptech-frontend
+    ports:
+      - "8080:80"
+    depends_on:
+      - api

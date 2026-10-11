@@ -1,12 +1,16 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import type { ReactNode } from "react";
 import { usePrepTech, diasRestantes } from "@/lib/preptech-store";
+import { useAiStatus } from "@/lib/api";
 
 const NAV = [
   { to: "/", num: "01", label: "Panel" },
   { to: "/banco", num: "02", label: "Banco de preguntas" },
   { to: "/conductual", num: "03", label: "Simulador conductual" },
-  { to: "/perfil", num: "04", label: "Perfil y meta" },
+  { to: "/coach", num: "04", label: "Coach IA" },
+  { to: "/iot", num: "05", label: "Módulo IoT" },
+  { to: "/ia", num: "06", label: "Configuración de IA" },
+  { to: "/perfil", num: "07", label: "Perfil y meta" },
 ] as const;
 
 export function AppShell({
@@ -21,6 +25,7 @@ export function AppShell({
   children: ReactNode;
 }) {
   const { estado } = usePrepTech();
+  const { status, offline } = useAiStatus();
   const path = useRouterState({ select: (s) => s.location.pathname });
   const dias = diasRestantes(estado.perfil.fechaEntrevista);
 
@@ -57,7 +62,16 @@ export function AppShell({
           })}
         </nav>
 
-        <div className="mt-auto p-3">
+        <div className="mt-auto space-y-3 p-3">
+          <Link
+            to="/ia"
+            className="flex items-center gap-2 rounded-sm border border-border bg-surface-2 px-3 py-2 text-xs"
+          >
+            <span
+              className={`size-2 rounded-full ${offline ? "bg-signal" : status?.connected ? "bg-primary" : "bg-muted-foreground"}`}
+            />
+            {offline ? "API sin conexión" : status?.connected ? `IA conectada · ${status.model}` : "IA desconectada"}
+          </Link>
           <div className="rounded-sm border border-border bg-surface-2 p-4">
             <p className="label-xs">Entrevista objetivo</p>
             <p className="mt-2 font-display text-3xl font-semibold text-primary">{dias} días</p>
