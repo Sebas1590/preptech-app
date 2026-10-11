@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as BancoRouteImport } from './routes/banco'
 import { Route as ConductualRouteImport } from './routes/conductual'
+import { Route as PerfilRouteImport } from './routes/perfil'
 import { Route as PracticaPreguntaIdRouteImport } from './routes/practica.$preguntaId'
 
 const IndexRoute = IndexRouteImport.update({
@@ -29,6 +30,11 @@ const ConductualRoute = ConductualRouteImport.update({
   path: '/conductual',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PerfilRoute = PerfilRouteImport.update({
+  id: '/perfil',
+  path: '/perfil',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PracticaPreguntaIdRoute = PracticaPreguntaIdRouteImport.update({
   id: '/practica/$preguntaId',
   path: '/practica/$preguntaId',
@@ -39,12 +45,14 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/banco': typeof BancoRoute
   '/conductual': typeof ConductualRoute
+  '/perfil': typeof PerfilRoute
   '/practica/$preguntaId': typeof PracticaPreguntaIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/banco': typeof BancoRoute
   '/conductual': typeof ConductualRoute
+  '/perfil': typeof PerfilRoute
   '/practica/$preguntaId': typeof PracticaPreguntaIdRoute
 }
 export interface FileRoutesById {
@@ -52,20 +60,29 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/banco': typeof BancoRoute
   '/conductual': typeof ConductualRoute
+  '/perfil': typeof PerfilRoute
   '/practica/$preguntaId': typeof PracticaPreguntaIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/banco' | '/conductual' | '/practica/$preguntaId'
+  fullPaths:
+    '/' | '/banco' | '/conductual' | '/perfil' | '/practica/$preguntaId'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/banco' | '/conductual' | '/practica/$preguntaId'
-  id: '__root__' | '/' | '/banco' | '/conductual' | '/practica/$preguntaId'
+  to: '/' | '/banco' | '/conductual' | '/perfil' | '/practica/$preguntaId'
+  id:
+    | '__root__'
+    | '/'
+    | '/banco'
+    | '/conductual'
+    | '/perfil'
+    | '/practica/$preguntaId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   BancoRoute: typeof BancoRoute
   ConductualRoute: typeof ConductualRoute
+  PerfilRoute: typeof PerfilRoute
   PracticaPreguntaIdRoute: typeof PracticaPreguntaIdRoute
 }
 
@@ -92,6 +109,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ConductualRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/perfil': {
+      id: '/perfil'
+      path: '/perfil'
+      fullPath: '/perfil'
+      preLoaderRoute: typeof PerfilRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/practica/$preguntaId': {
       id: '/practica/$preguntaId'
       path: '/practica/$preguntaId'
@@ -106,6 +130,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   BancoRoute: BancoRoute,
   ConductualRoute: ConductualRoute,
+  PerfilRoute: PerfilRoute,
   PracticaPreguntaIdRoute: PracticaPreguntaIdRoute,
 }
 export const routeTree = rootRouteImport
