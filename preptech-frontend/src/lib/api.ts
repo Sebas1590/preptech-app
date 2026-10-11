@@ -22,6 +22,9 @@ export async function api<T>(path: string, init: { method?: string; json?: unkno
     throw new ApiError("No se pudo conectar con el backend. ¿Está corriendo en el puerto 8000?", 0);
   }
   const data = await res.json().catch(() => null);
+  if (!res.ok && data === null && [502, 503, 504].includes(res.status)) {
+    throw new ApiError("El backend (API) no está disponible. Debe estar desplegado junto al frontend.", res.status);
+  }
   if (!res.ok) {
     const d = data?.detail;
     const msg = typeof d === "string" ? d : Array.isArray(d) ? d.map((x) => x.msg).join("; ") : `Error ${res.status}`;
